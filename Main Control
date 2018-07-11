@@ -1,0 +1,29 @@
+byte prop1 = 2; // Pin 2,3,4,5,6,7
+byte prop2 = 3;
+byte prop3 = 4;
+byte prop4 = 5;
+byte prop5 = 6;
+byte prop6 = 7;
+byte pin_pulsa_speed = 8;
+byte pin_pulsa_stir = 9;
+byte pin_pulsa_winch = 10;
+
+void setup() {
+  // put your setup code here, to run once:
+Serial.begin(9600);
+pinMode(prop1,HIGH);
+pinMode(prop2,HIGH);
+pinMode(prop3,HIGH);
+pinMode(prop4,HIGH);
+pinMode(prop5,HIGH);
+pinMode(prop6,HIGH);
+
+pinMode(pin_pulsa_speed,INPUT);
+pinMode(pin_pulsa_stir,INPUT);
+pinMode(pin_pulsa_winch,INPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  Serial.println(pulseIn(pin_pulsa_winch,HIGH));
+}
