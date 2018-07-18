@@ -48,6 +48,9 @@ line6 = C.create_line(275,4,275,650,fill = 'black', width = 4)
 speedo1 = C.create_arc(40,20,250,300, start = 0, extent = 180, fill = "black")
 sub_speedo1 = C.create_arc(115,130,175,180, start = 0, extent = 180, fill = "gray")
 speedo_line1 = C.create_line(145,150,60,150,fill = 'red', width = 4)
+steering1 = C.create_oval(50, 170, 240, 290, width = 3)
+steering_line1 = C.create_line(50,230,150,230,fill = 'red', width = 4)
+
 
 speedo2 = C.create_arc(300,20,520,300, start = 0, extent = 180, fill = "black")
 sub_speedo2 = C.create_arc(385,130,445,180, start = 0, extent = 180, fill = "gray")
