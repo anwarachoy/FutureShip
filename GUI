@@ -29,18 +29,24 @@ prop1 = Button(top, text = "Propeller 1 Info", command = prop1info)
 prop2 = Button(top, text = "Propeller 2 Info", command = prop2info)
 prop3 = Button(top, text = "Propeller 3 Info", command = prop3info)
 prop4 = Button(top, text = "Propeller 4 Info", command = prop4info)
-prop1.place(x = 50,y = 300)
-prop2.place(x = 50,y = 80)
-prop3.place(x = 50,y = 100)
-prop4.place(x = 50,y = 100)
+prop1.place(x = 100,y = 350)
+prop2.place(x = 370,y = 350)
+prop3.place(x = 100,y = 670)
+prop4.place(x = 370,y = 670)
 
 
 coord = 10, 50, 240, 210
 #arc = C.create_arc(coord, start = 0, extent = 200, fill = "red")
 line = C.create_line(5,4,5,700,fill = 'black', width = 4)
-line1 = C.create_line(5,350,550,350,fill = 'black', width = 4)
+line1 = C.create_line(5,330,550,330,fill = 'black', width = 4)
 line2 = C.create_line(550,4,550,700,fill = 'black', width = 4)
 line3 = C.create_line(550,4,550,700,fill = 'black', width = 4)
+line4 = C.create_line(5,4,550,4,fill = 'black', width = 4)
+line5 = C.create_line(5,650,550,650,fill = 'black', width = 4)
+line6 = C.create_line(275,4,275,650,fill = 'black', width = 4)
+
+arc = C.create_arc(coord, start = 0, extent = 200, fill = "red")
+
 C.pack()
 
 
