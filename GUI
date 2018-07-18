@@ -3,9 +3,10 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import time
+import math
 
 top = Tk()
-top.geometry("1000x1000")
+top.geometry("5000x5000")
 def helloCallBack():
    msg = messagebox.showinfo( "Hello Python", "Hello World")
 def waduh():
@@ -17,14 +18,15 @@ def gantiline():
 label_1 = Label(top, bd=8 , relief = "solid", font = "Times 22 bold", bg = "red", fg = "white", text = " Hello World")
 label_1.pack()
 label_1["bg"] = "green"
+
+C = Canvas(top, bg = "blue", height = 700, width = 1500)
+
 B = Button(top, text = "Hello", command = waduh)
 B2 = Button(top, text = "Coba ini", command = helloCallBack)
 B3 = Button(top, text = "Ganti Line", command = gantiline)
 B.place(x = 50,y = 50)
 B2.place(x = 50,y = 80)
 B3.place(x = 50,y = 100)
-C = Canvas(top, bg = "blue", height = 250, width = 300)
-
 
 a = int(random.randint(1,30))
 print(a)
