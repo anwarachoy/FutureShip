@@ -1,115 +1,38 @@
-import tkinter as tk
-from tkinter import ttk
-import math
+from tkinter import *
 
-class DrawMeter(tk.Canvas):
+from tkinter import messagebox
+import random
+import time
 
-    def __init__(self, parent, *args, **kwargs):
-        tk.Canvas.__init__(self, parent, *args, **kwargs)
-        self.config(bg = "grey")
-        if (int(self['height']) * 2 > int(self['width'])):
-            boxSide = int(self['width'])
-        else:
-            boxSide = int(self['height']) * 2
-        
-        self.boxX = boxSide / 2
-        self.boxY = boxSide / 2
-        self.boxRadius = int(0.40 * float(boxSide))
-        self.start = 0
-        self.end = 1
+top = Tk()
+top.geometry("1000x1000")
+def helloCallBack():
+   msg = messagebox.showinfo( "Hello Python", "Hello World")
+def waduh():
+   msg = messagebox.showinfo("Waduh", "Waduhlah")
+def gantiline():
+   warnaline = 'red'
+   line = C.create_line(10,10,200,200,fill = 'red')
 
-        self.drawBackground()
-        self.drawTicks()
-        self.drawNeedle()
-        #print(self.boxRadius)
+label_1 = Label(top, bd=8 , relief = "solid", font = "Times 22 bold", bg = "red", fg = "white", text = " Hello World")
+label_1.pack()
+label_1["bg"] = "green"
+B = Button(top, text = "Hello", command = waduh)
+B2 = Button(top, text = "Coba ini", command = helloCallBack)
+B3 = Button(top, text = "Ganti Line", command = gantiline)
+B.place(x = 50,y = 50)
+B2.place(x = 50,y = 80)
+B3.place(x = 50,y = 100)
+C = Canvas(top, bg = "blue", height = 250, width = 300)
 
-    def drawBackground(self):
-        bgColour = "black"
-        self.create_arc((5,
-                         5,
-                         400,
-                         400),
-                        fill = bgColour, start = 90)# 20 20 untuk mengatur besar kecilnya 400 pertama horizontal 400 kedua vertikal 
 
-    def drawTicks(self):
-        length = (self.boxRadius /10) / 8 #jarum pendek
-        for deg in range(5, 85, 6):
-            rad = math.radians(deg)
-            self.Tick(rad, length)
-        for deg in range(5, 91, 18):
-            rad = math.radians(deg)
-            self.Tick(rad, length * 2) # Jarum Panjang
-        print(self.boxRadius)
+a = int(random.randint(1,30))
+print(a)
 
-    def Tick(self, angle, length):
-        cos = math.cos(angle)
-        sin = math.sin(angle)
-        radius = self.boxRadius * 2 # Penempatan Jarum Panjang dan Pendek
-        X = self.boxX * 2 # Penempatan Jarum Panjang dan Pendek
-        Y = self.boxY * 2 # Penempatan Jarum Panjang dan Pendek
-        self.create_line((180 - 160 * cos,
-                          180 - 160 * sin,
-                          200 - (160 - length) * cos - 10,
-                          200 - (160 - length) * sin - 10),
-                         fill = "white", width = 2) # Lebar tiap jarum, X - radius * cos, Y - radius * sin, X - (radius - length) * cos, Y - (radius - length) * sin
-        #print(length)
+coord = 10, 50, 240, 210
+arc = C.create_arc(coord, start = 0, extent = 200, fill = "red")
+line = C.create_line(10,10,a,200,fill = 'white')
+C.pack()
 
-    def drawText(self, start = 0, end = 10):
-        interval = end / 5 # Angka di speedometer
-        value = start #angka paling kecil
-        length = self.boxRadius / 2 #Radius penempatan angka-angka
-        for deg in range(5, 91, 18):
-            rad = math.radians(deg)
-            cos = math.cos(rad)
-            sin = math.sin(rad)
-            radius = self.boxRadius * 2
-            self.create_text(110 * 2 - (210 - 40 - 1) * cos,
-                             102 * 2 - (210 - 40 - 1) * sin,
-                             text = str("{0:.1f}".format(value)),
-                             fill = "green",
-                             font = ("Arial", 12, "italic", "bold")) # Membuat angka-angka, self.boxX * 2 - (radius - length - 1) * cos, self.boxY * 2 - (radius - length - 1) * sin
-            value = value + interval
-            #print(sin)
 
-    def setRange(self, start, end):
-        self.start = start
-        self.end = end
-        self.drawText(start, end)
-
-    def drawNeedle(self):#nempatin sepermpat lingkaran yang dalam
-        X = self.boxX * 2
-        Y = self.boxY * 2
-        length = 2
-        self.meterHand = self.create_line(2, 2, 2, 2,
-                                          fill = "green", width = 4)
-        self.create_arc(150, 150, 250, 250,
-                        fill = "#c0c0c0", outline = "#c0c0c0", start = 90)
-        print(X)
-
-    def updateNeedle(self, value):
-        length = self.boxRadius - (self.boxRadius / 4)
-        deg = 8 * (value - self.start) / self.end - 180 #80 menunjukkan keupdate-an , 180 menunjukkan mulainya darimana 
-        rad = math.radians(deg)
-        self.coords(self.meterHand, 200, 200,
-                    3 + 10 * math.cos(rad) + 40,
-                    3 + 10 * math.sin(rad) + 40) #2 dan 2 menunjukkan penempatan si needle
-        #print(value)
-
-value = 0
-
-def update_frame():
-    global value
-    if value < 2:
-        value = value + 0.01
-    print(value)
-    meter.updateNeedle(value)
-    container.after(200, update_frame)
-
-root = tk.Tk()
-container = tk.Frame(root)
-container.pack()
-meter = DrawMeter(container, height = 2000, width = 2000, bg = "white")
-meter.setRange(0, 1)#ngeganti range angka di speedometernya
-meter.pack()
-update_frame()
-root.mainloop()	
+top.mainloop()
