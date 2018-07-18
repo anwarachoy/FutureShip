@@ -7,33 +7,40 @@ import math
 
 top = Tk()
 top.geometry("5000x5000")
-def helloCallBack():
-   msg = messagebox.showinfo( "Hello Python", "Hello World")
-def waduh():
-   msg = messagebox.showinfo("Waduh", "Waduhlah")
+def prop1info():
+   msg = messagebox.showinfo( "Syergie Propeller", "Diameter : , Mass : , Torque Max : , RPM Max : ")
+def prop2info():
+   msg = messagebox.showinfo( "Syergie Propeller", "Diameter : , Mass : , Torque Max : , RPM Max : ")
+def prop3info():
+   msg = messagebox.showinfo( "Syergie Propeller", "Diameter : , Mass : , Torque Max : , RPM Max : ")
+def prop4info():
+   msg = messagebox.showinfo( "Syergie Propeller", "Diameter : , Mass : , Torque Max : , RPM Max : ")
 def gantiline():
    warnaline = 'red'
    line = C.create_line(10,10,200,200,fill = 'red')
 
-label_1 = Label(top, bd=8 , relief = "solid", font = "Times 22 bold", bg = "red", fg = "white", text = " Hello World")
+label_1 = Label(top, bd=8 , relief = "solid", font = "Times 22 bold", bg = "red", fg = "white", text = " Ship Control System")
 label_1.pack()
 label_1["bg"] = "green"
 
 C = Canvas(top, bg = "blue", height = 700, width = 1500)
 
-B = Button(top, text = "Hello", command = waduh)
-B2 = Button(top, text = "Coba ini", command = helloCallBack)
-B3 = Button(top, text = "Ganti Line", command = gantiline)
-B.place(x = 50,y = 50)
-B2.place(x = 50,y = 80)
-B3.place(x = 50,y = 100)
+prop1 = Button(top, text = "Propeller 1 Info", command = prop1info)
+prop2 = Button(top, text = "Propeller 2 Info", command = prop2info)
+prop3 = Button(top, text = "Propeller 3 Info", command = prop3info)
+prop4 = Button(top, text = "Propeller 4 Info", command = prop4info)
+prop1.place(x = 50,y = 300)
+prop2.place(x = 50,y = 80)
+prop3.place(x = 50,y = 100)
+prop4.place(x = 50,y = 100)
 
-a = int(random.randint(1,30))
-print(a)
 
 coord = 10, 50, 240, 210
-arc = C.create_arc(coord, start = 0, extent = 200, fill = "red")
-line = C.create_line(10,10,a,200,fill = 'white')
+#arc = C.create_arc(coord, start = 0, extent = 200, fill = "red")
+line = C.create_line(5,4,5,700,fill = 'black', width = 4)
+line1 = C.create_line(5,350,550,350,fill = 'black', width = 4)
+line2 = C.create_line(550,4,550,700,fill = 'black', width = 4)
+line3 = C.create_line(550,4,550,700,fill = 'black', width = 4)
 C.pack()
 
 
