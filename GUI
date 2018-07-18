@@ -49,10 +49,13 @@ speedo1 = C.create_arc(40,20,250,300, start = 0, extent = 180, fill = "black")
 sub_speedo1 = C.create_arc(115,130,175,180, start = 0, extent = 180, fill = "gray")
 
 speedo2 = C.create_arc(300,20,520,300, start = 0, extent = 180, fill = "black")
+sub_speedo2 = C.create_arc(385,130,445,180, start = 0, extent = 180, fill = "gray")
 
 speedo3 = C.create_arc(40,340,250,620, start = 0, extent = 180, fill = "black")
 
-speedo3 = C.create_arc(300,340,520,620, start = 0, extent = 180, fill = "black")
+
+speedo4 = C.create_arc(300,340,520,620, start = 0, extent = 180, fill = "black")
+sub_speedo4 = C.create_arc(385,450,445,500, start = 0, extent = 180, fill = "gray")
 C.pack()
 
 
