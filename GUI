@@ -50,19 +50,29 @@ sub_speedo1 = C.create_arc(115,130,175,180, start = 0, extent = 180, fill = "gra
 speedo_line1 = C.create_line(145,150,60,150,fill = 'red', width = 4)
 steering1 = C.create_oval(50, 170, 240, 290, width = 3)
 steering_line1 = C.create_line(50,230,150,230,fill = 'red', width = 4)
+speedo1_angka0 = C.create_text(60,150,text = "0", font = ("Arial", 8, "bold"), fill = "white")
+speedo1_angka50 = C.create_text(70,100,text = "50", font = ("Arial", 8, "bold"), fill = "white")
+speedo1_angka100 = C.create_text(98,60,text = "100", font = ("Arial", 8, "bold"), fill = "white")
+speedo1_angka150 = C.create_text(143,35,text = "150", font = ("Arial", 8, "bold"), fill = "white")
 
 
 speedo2 = C.create_arc(300,20,520,300, start = 0, extent = 180, fill = "black")
 sub_speedo2 = C.create_arc(385,130,445,180, start = 0, extent = 180, fill = "gray")
 speedo_line2 = C.create_line(415,150,340,150,fill = 'red', width = 4)
+steering2 = C.create_oval(320, 170, 510, 290, width = 3)
+steering_line2 = C.create_line(330,230,430,230,fill = 'red', width = 4)
 
 speedo3 = C.create_arc(40,340,250,620, start = 0, extent = 180, fill = "black")
 sub_speedo3 = C.create_arc(115,450,175,500, start = 0, extent = 180, fill = "gray")
 speedo_line3 = C.create_line(145,470,60,470,fill = 'red', width = 4)
+steering3 = C.create_oval(50, 490, 240, 610, width = 3)
+steering_line3 = C.create_line(50,550,150,550,fill = 'red', width = 4)
 
 speedo4 = C.create_arc(300,340,520,620, start = 0, extent = 180, fill = "black")
 sub_speedo4 = C.create_arc(385,450,445,500, start = 0, extent = 180, fill = "gray")
 speedo_line4 = C.create_line(415,470,340,470,fill = 'red', width = 4)
+steering4 = C.create_oval(320, 490, 510, 610, width = 3)
+steering_line4 = C.create_line(330,550,430,550,fill = 'red', width = 4)
 
 C.pack()
 
