@@ -8,12 +8,26 @@ IPAddress ip(192, 168, 1, 10);
 IPAddress server(192, 168, 1, 180);
 
 void callback(char* topic, byte* payload, unsigned int length) {
+  char masuk[100];
+//  char Steer[100];
+  char Winch[100];
+  String Speed;
+  String Steer;
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
   for (int i=0;i<length;i++) {
+    masuk[i] = (char)payload[i];
     Serial.print((char)payload[i]);
   }
+  Speed = String(String(masuk[0]) + String(masuk[1]) + String(masuk[2]) + String(masuk[3]) );
+  Steer = String(String(masuk[5]) + String(masuk[6]) + String(masuk[7]) + String(masuk[8]) );
+  //String str(masuk[10]);
+  Serial.println();
+  Serial.print("Masuk : ");
+  Serial.print((Speed.toInt())+1000);
+  Serial.print(",");
+  Serial.print((Steer.toInt()));
   Serial.println();
 }
 
