@@ -1,0 +1,50 @@
+// Credit : Aji Choirul Anwar
+const int dataIN = A2; //Proximity pin input
+
+unsigned long prevmillis; // To store time
+unsigned long duration; // To store time difference
+unsigned long refresh; // To store time for refresh of reading
+
+int rpm; // RPM value
+
+boolean currentstate; // Current state of Proximity input scan
+boolean prevstate; // State of Proximity sensor in previous scan
+boolean fanoff;
+
+void setup()
+{
+  pinMode(dataIN,INPUT);       
+  prevmillis = 0;
+  prevstate = HIGH;
+  fanoff = true; 
+  Serial.begin(9600);
+}
+
+void loop()
+{
+ // RPM Measurement
+  currentstate = digitalRead(dataIN); // Read Proximity sensor state
+ if( prevstate != currentstate) // If there is change in input
+   {
+     if( currentstate == LOW ) // If input only changes from HIGH to LOW
+       {
+         duration = ( micros() - prevmillis ); // Time difference between revolution in microsecond
+         rpm = (60000000/duration); // rpm = (1/ time millis)*1000*1000*60;
+         prevmillis = micros(); // store time for nect revolution calculation
+         fanoff = true;
+       }
+     else
+      {
+         Serial.print("Speed = ");
+         Serial.print(rpm);
+         Serial.println(" RPM");
+      }
+   }
+  prevstate = currentstate; // store this scan (prev scan) data for next scan
+
+  if (((micros() - prevmillis) > 60000000) && (fanoff==true))
+    {
+      fanoff = false;
+      Serial.println("Speed = 0 RPM");
+    }
+}
