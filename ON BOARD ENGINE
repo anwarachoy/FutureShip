@@ -1,0 +1,225 @@
+/* On Board Propeller System Engine */
+/* Mochamad Teguh Subarkah */
+
+/* Ethernet */
+#include <SPI.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
+
+// Update these with values suitable for your network.
+byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+IPAddress ip(192, 168, 1, 10);
+IPAddress server(192, 168, 1, 180);
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  char masuk[100];
+  String Speed;
+  String Steer;
+  String Winch;
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    masuk[i] = (char)payload[i];
+    Serial.print((char)payload[i]);
+  }
+  Speed = String(String(masuk[0]) + String(masuk[1]) + String(masuk[2]) + String(masuk[3]) );
+  Steer = String(String(masuk[5]) + String(masuk[6]) + String(masuk[7]) + String(masuk[8]) );
+  Winch = String(String(masuk[10]) + String(masuk[11]) + String(masuk[12]) + String(masuk[13]) );
+  Serial.println();
+  Serial.print("Masuk : ");
+  Serial.print((Speed.toInt()));
+  Serial.print(",");
+  Serial.print((Steer.toInt()));
+  Serial.print(",");
+  Serial.print((Winch.toInt()));
+  Serial.println();
+}
+
+EthernetClient ethClient;
+PubSubClient client(ethClient);
+
+void reconnect(double engine_temp, double rpm_engine , double rpm_propeller, double prop_thruster, double solar_level , double flow_pump, double depth_sensor) {
+  // Loop until we're reconnected
+  char engine_temperature[10];
+  char rpm_mesin[10];
+  char rpm_baling[10];
+  char baling_thruster[10];
+  char solar_tanki[10];
+  char flowmeter[10];
+  char dalam[10];
+
+  dtostrf(engine_temp,5,5,engine_temperature);
+  dtostrf(rpm_engine,5,5,rpm_mesin);
+  dtostrf(rpm_propeller,5,5,rpm_baling);
+  dtostrf(prop_thruster,5,5,baling_thruster);
+  dtostrf(solar_level,5,5,solar_tanki);
+  dtostrf(flow_pump,5,5,flowmeter);
+  dtostrf(depth_sensor,5,5,dalam);
+  
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("arduinoClient")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      
+      
+      client.publish("engine_temp",engine_temperature);
+      client.publish("rpm_engine",rpm_mesin);
+      client.publish("rpm_propeller",rpm_baling);
+      client.publish("prop_thruster",baling_thruster);
+      client.publish("solar_level",solar_tanki);
+      client.publish("depth_sensor",flowmeter);
+      client.publish("flow_pump",dalam);
+      
+      // ... and resubscribe
+      client.subscribe("pulse_in");
+      //client.subscribe("test2");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+
+/* Temperature Measurement */
+#include <Adafruit_MAX31865.h> // Declare Library 
+Adafruit_MAX31865 max = Adafruit_MAX31865(10, 11, 12, 13); // Declare Pin
+#define RREF      430.0 // The value of the Rref resistor. Use 430.0 for PT100 and 4300.0 for PT1000
+#define RNOMINAL  100.0 // 100.0 for PT100, 1000.0 for PT1000
+
+/* Current Measurement */
+#include "EmonLib.h"                   // Include Emon Library
+EnergyMonitor emon1;                   // Create an instance
+
+/* RPM Measurement */ 
+const int dataIN = A2; //Proximity pin input
+
+unsigned long prevmillis; // To store time
+unsigned long duration; // To store time difference
+unsigned long refresh; // To store time for refresh of reading
+
+int rpm; // RPM value
+
+boolean currentstate; // Current state of Proximity input scan
+boolean prevstate; // State of Proximity sensor in previous scan
+boolean fanoff;
+
+/* DC Voltage Measurement */
+int analogInput = A1;                                      
+float vout = 0.0;
+float vin = 0.0;
+float R1 = 30000.0; //  
+float R2 = 7500.0; // 
+int value = 0;
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200); // Declare Baud Rate
+
+  /* Ethernet */
+  client.setServer(server, 1883);
+  client.setCallback(callback);
+
+  Ethernet.begin(mac, ip);
+
+  
+  /* RPM */
+  pinMode(dataIN,INPUT);       
+  prevmillis = 0;
+  prevstate = HIGH;
+  fanoff = true;
+
+  /* Temperature */
+  max.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary, this is for 3WIRE PT100
+
+  /* Current */
+   emon1.current(1, 111.1);             // Current: input pin, calibration.
+
+  /* Voltage */
+   pinMode(analogInput, INPUT);
+}
+double flowmeter_pump, sensor_depth;
+void loop() {
+  // put your main code here, to run repeatedly:
+  // Temperature
+  uint16_t rtd = max.readRTD();
+  float ratio = rtd;
+  ratio /= 32768;
+
+  /* Ethernet */
+  if (!client.connected()) {
+    reconnect(max.temperature(RNOMINAL, RREF), rpm , rpm, analogRead(A3), analogRead(A5), flowmeter_pump, sensor_depth);
+    //reconnect(double engine_temp, double rpm_engine , double rpm_propeller, double prop_thruster, double solar_level , double flow_pump, double depth_sensor);
+  }
+  client.loop();
+  
+  // Current
+  double Irms = emon1.calcIrms(1480);  // Calculate Irms only
+  
+  // RPM Measurement
+  currentstate = digitalRead(dataIN); // Read Proximity sensor state
+ if( prevstate != currentstate) // If there is change in input
+   {
+     if( currentstate == LOW ) // If input only changes from HIGH to LOW
+       {
+         duration = ( micros() - prevmillis ); // Time difference between revolution in microsecond
+         rpm = (60000000/duration); // rpm = (1/ time millis)*1000*1000*60;
+         prevmillis = micros(); // store time for nect revolution calculation
+         fanoff = true;
+       }
+     else
+      {
+         Serial.print("Speed = ");
+         Serial.print(rpm);
+         Serial.println(" RPM");
+      }
+   }
+  prevstate = currentstate; // store this scan (prev scan) data for next scan
+
+  if (((micros() - prevmillis) > 60000000) && (fanoff==true))
+    {
+      fanoff = false;
+      Serial.println("Speed = 0 RPM");
+    }
+
+  // Voltage
+  value = analogRead(analogInput);
+   vout = (value * 5.0) / 1024.0; // see text
+   vin = vout / (R2/(R1+R2));
+  
+  Serial.print("INPUT V= ");
+  Serial.println(vin,2);
+  Serial.print("Current = ");
+  Serial.println(Irms,1);           // Irms
+  Serial.print("Temperature = "); Serial.println(max.temperature(RNOMINAL, RREF));
+
+  uint8_t fault = max.readFault();
+  if (fault) {
+    Serial.print("Fault 0x"); Serial.println(fault, HEX);
+    if (fault & MAX31865_FAULT_HIGHTHRESH) {
+      Serial.println("RTD High Threshold"); 
+    }
+    if (fault & MAX31865_FAULT_LOWTHRESH) {
+      Serial.println("RTD Low Threshold"); 
+    }
+    if (fault & MAX31865_FAULT_REFINLOW) {
+      Serial.println("REFIN- > 0.85 x Bias"); 
+    }
+    if (fault & MAX31865_FAULT_REFINHIGH) {
+      Serial.println("REFIN- < 0.85 x Bias - FORCE- open"); 
+    }
+    if (fault & MAX31865_FAULT_RTDINLOW) {
+      Serial.println("RTDIN- < 0.85 x Bias - FORCE- open"); 
+    }
+    if (fault & MAX31865_FAULT_OVUV) {
+      Serial.println("Under/Over voltage"); 
+    }
+    max.clearFault();
+  }
+}
