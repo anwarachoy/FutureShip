@@ -1,0 +1,8 @@
+# Start Mosquitto : 
+mosquitto -v 
+
+#Send Mosquitto : 
+mosquitto_sub -t test
+
+# Receive Mosquitto : 
+mosquitto_pub -h 127.0.0.1 -p 1883 -t test -m "message"
