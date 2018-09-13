@@ -1,0 +1,43 @@
+char data_rpm_engine[10],data_rpm_propeller[10], data_level_tanki[10], data_mode_control[2];
+String send_data;
+char data_serial[20];
+double rpm_engine, rpm_propeller, tanki_level;
+int mode_control;
+void setup() {
+  // Begin the Serial at 9600 Baud
+  Serial.begin(9600);
+}
+int i, length_message;
+void loop() {
+  rpm_engine = 100;
+  rpm_propeller = 100;
+  mode_control = 1;
+  tanki_level = 15;
+  if(rpm_engine > 999){
+  dtostrf(rpm_engine,4,0,data_rpm_engine);
+  }
+  else if (rpm_engine<999){
+    dtostrf(rpm_engine,3,0,data_rpm_engine);
+  }
+  dtostrf(rpm_propeller,3,0,data_rpm_propeller);
+  dtostrf(tanki_level,2,0,data_level_tanki);
+  dtostrf(mode_control,1,0,data_mode_control);
+  Serial.print("Rpm Engine ");Serial.println(data_rpm_engine);
+  Serial.print("Rpm Propeller ");Serial.println(data_rpm_propeller);
+  Serial.print("tanki_level ");Serial.println(data_level_tanki);
+  Serial.print("mode_control ");Serial.println(data_mode_control);
+  send_data = String((String(data_rpm_engine)) + "." + String(data_rpm_propeller) + "." + String(data_level_tanki) + "." + String(data_mode_control));
+  Serial.print("send data : ");Serial.println(send_data);
+  Serial.println(send_data.length());
+  length_message = send_data.length();
+  char data[length_message];
+  send_data.toCharArray(data,length_message+1);
+  Serial.write(data); //Write the serial data
+  delay(10);
+}
+char* string2char(String command){
+    if(command.length()!=0){
+        char *p = const_cast<char*>(command.c_str());
+        return p;
+    }
+}
