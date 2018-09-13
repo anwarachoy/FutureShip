@@ -1,0 +1,53 @@
+
+#include <Wire.h>  // Comes with Arduino IDE
+#include <LiquidCrystal_I2C.h>
+
+//                    addr, en,rw,rs,d4,d5,d6,d7,bl,blpol
+LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);  // Atur LCD I2C address
+
+int rpm_engine, rpm_propeller, level_tanki, mode_control;
+
+void setup()   /*----( SETUP: RUNS ONCE )----*/
+{
+  Serial.begin(9600);  // Mengaktifkan serial
+
+  lcd.begin(20,4);         // inisialisasi LCD dengan 20 karakter dan 4 baris
+
+  for(int i = 0; i< 3; i++)
+  {
+    lcd.backlight();
+    delay(250);
+    lcd.noBacklight();
+    delay(250);
+  }
+  lcd.backlight(); // Diakhiri dengan backlight on  
+
+    
+
+}/*--(end setup )---*/
+
+
+void loop()   /*----( LOOP: DIEKSEKUSI TERUS MENERUS )----*/
+{
+  rpm_engine = 1000;
+  rpm_propeller = 200;
+  level_tanki = 15;
+  mode_control = 1;
+  lcd.setCursor(0,0); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print("RPM Engine  : ");
+  lcd.setCursor(13,0); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print(rpm_engine);
+  lcd.setCursor(0,1); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print("RPM Prop    : ");
+  lcd.setCursor(13,1); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print(rpm_propeller);
+  lcd.setCursor(0,2); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print("Level Tanki : ");
+  lcd.setCursor(13,2); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print(level_tanki);
+  lcd.setCursor(0,3); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print("Mode Control: ");
+  lcd.setCursor(13,3); //Huruf akan mulai pada karakter ke 4 dan baris 0 pada LCD
+  lcd.print(mode_control);
+  
+}/* --(end main loop )-- */
