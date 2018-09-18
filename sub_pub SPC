@@ -1,0 +1,126 @@
+#include <SPI.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
+
+// Update these with values suitable for your network.
+byte mac[]    = {  0xDA, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+IPAddress ip(123, 45, 0, 8);
+IPAddress server(123, 45, 0, 10);
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  char masuk[100];
+//  char Steer[100];
+  char Winch[100];
+  String Speed;
+  float speed_out;
+  String Steer;
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    masuk[i] = (char)payload[i];
+    Serial.print((char)payload[i]);
+  }
+  Speed = String(String(masuk[0]) + String(masuk[1]) + String(masuk[2]) + String(masuk[3]) );
+  Steer = String(String(masuk[5]) + String(masuk[6]) + String(masuk[7]) + String(masuk[8]) );
+  //String str(masuk[10]);
+  Serial.println();
+  Serial.print("Masuk : ");
+  speed_out = (Speed.toInt())+1000;
+  Serial.print(speed_out);
+  Serial.print(",");
+  Serial.print((Steer.toInt()));
+  Serial.println();
+  /*if (speed_out == 1000){
+   client.publish("outTopik","hello gigs");
+  }(*/
+}
+
+EthernetClient ethClient;
+PubSubClient client(ethClient);
+PubSubClient client1(ethClient);
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("arduinoClient")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      //client.publish("outTopic","hello world");
+      // ... and resubscribe
+      //client.subscribe("outTopic");
+      //client.subscribe("test2");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+
+void reconnect1() {
+  // Loop until we're reconnected
+  while (!client1.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client1.connect("arduinoClient")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      //client.publish("outTopic","hello world");
+      // ... and resubscribe
+      //client.subscribe("outTopic");
+      //client.subscribe("test2");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client1.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void setup()
+{
+  Serial.begin(57600);
+
+  client.setServer(server, 1883);
+  client.setCallback(callback);
+  client1.setServer(server, 1885);
+  client1.setCallback(callback);
+
+  Ethernet.begin(mac, ip);
+  // Allow the hardware to sort itself out
+  delay(1500);
+}
+int dummy_switch;
+int dummy_data = 0;
+char msgBuffer[20];
+void loop()
+{
+  if (!client.connected()) {
+    reconnect();
+  }
+
+  if (!client1.connected()) {
+    reconnect1();
+  }
+  dummy_switch = 1;
+  
+  
+   Serial.println("Subscribing"); 
+   //client.publish("outTopik","hello gigs");
+   client.subscribe("topik_out");
+   client.publish("wkwk", "enter");
+  //client.subscribe("test2");
+  
+  //client1.loop();
+  client.loop();
+  dummy_data ++;
+  delay(10);
+}
