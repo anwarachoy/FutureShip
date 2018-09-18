@@ -1,0 +1,59 @@
+import time
+import paho.mqtt.client as paho
+broker="123.45.0.10"
+port1 = 1883
+port = 1884
+port2 = 1885
+#broker="iot.eclipse.org"
+#define callback
+start_time = time.time()
+text = ""
+
+def on_message(client, userdata, message):
+    #time.sleep(0.2)
+    global text 
+    text = str(message.payload.decode("utf-8"))
+    print("received message =",text)
+    
+
+def on_publish(client,userdata,result):             #create function for callback
+    print("data published \n")
+    print(text)
+    pass
+
+client= paho.Client("client-001") #create client object client1.on_publish = on_publish #assign function to callback client1.connect(broker,port) #establish connection client1.publish("house/bulb1","on")
+client1 = paho.Client("client-002")
+client2 = paho.Client("client-003")
+client1.on_publish = on_publish                          #assign function to callback
+######Bind function to callback
+client.on_message=on_message
+client1.on_message=on_message
+client2.on_message=on_message
+#####
+print("connecting to broker ",broker)
+client.connect(broker,port)#connect
+client1.connect(broker,port1)#connect
+client2.connect(broker,port2)#connect
+client.loop_start() #start loop to process received messages
+client1.loop_start() #start loop to process received messages
+client2.loop_start() #start loop to process received messages
+print("subscribing ")
+kirim = 0
+while True:
+	#print("Message 1 : ")
+	client.loop_start()
+	                   #publish
+	
+	#time.sleep(0.5)
+	client.subscribe("outTopik")#subscribe
+	client1.publish("topik_out","1500")
+	client1.subscribe("wkwk")
+	#print(text)
+	#end_time = time.time()
+	#print((end_time - start_time))
+	#client.loop_stop() #stop loop
+	#time.sleep(1)
+	#print("Message 2 : ")
+	#client.loop_start()
+	#client.subscribe("outTopik")#subscribe
+	#client.loop_stop()
