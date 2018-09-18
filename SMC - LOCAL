@@ -1,0 +1,54 @@
+/* Main Control - Local */
+/* Mochamad Teguh Subarkah */
+
+
+#define prop1 4
+#define prop2 5
+#define prop3 6
+#define prop4 7
+#define speed_in 8
+#define steer_in 9
+#define winch_in 10
+
+double pulse_speed_in,pulse_steer_in,pulse_winch_in;
+
+void setup() {
+  //Serial begin
+  Serial.begin(9600);
+  
+  // Pin Mode propeller w/ pullupresistor
+  pinMode(prop1, INPUT);
+  pinMode(prop2, INPUT);
+  pinMode(prop3, INPUT);
+  pinMode(prop4, INPUT);
+  pinMode(speed_in, INPUT);
+  pinMode(steer_in, INPUT);
+  pinMode(winch_in, INPUT);
+  
+  digitalWrite(prop1, HIGH);
+  digitalWrite(prop2, HIGH);
+  digitalWrite(prop3, HIGH);
+  digitalWrite(prop4, HIGH);
+  
+}
+
+void loop() {
+
+    /* Receive Pulse from APM */
+   //pulse_speed_in = pulseIn(speed_in,HIGH);
+   Serial.print("Pulse Speed In = ");
+   Serial.println(pulse_speed_in);
+   
+   Serial.print("Prop 1 = ");
+   Serial.println(not(digitalRead(prop1)));
+   Serial.print("Prop 2 = ");
+   Serial.println(not(digitalRead(prop2)));
+   Serial.print("Prop 3 = ");
+   Serial.println(not(digitalRead(prop3)));
+   Serial.print("Prop 4 = ");
+   Serial.println(not(digitalRead(prop4)));
+
+    
+
+
+}
