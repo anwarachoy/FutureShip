@@ -1,0 +1,181 @@
+/*
+ Basic MQTT example
+
+ This sketch demonstrates the basic capabilities of the library.
+ It connects to an MQTT server then:
+  - publishes "hello world" to the topic "outTopic"
+  - subscribes to the topic "inTopic", printing out any messages
+    it receives. NB - it assumes the received payloads are strings not binary
+
+ It will reconnect to the server if the connection is lost using a blocking
+ reconnect function. See the 'mqtt_reconnect_nonblocking' example for how to
+ achieve the same result without blocking the main loop.
+ 
+*/
+
+/* On Board Propeller System Engine */
+/* Mochamad Teguh Subarkah */
+
+#include <SPI.h>
+#include <Ethernet.h>
+#include <PubSubClient.h>
+
+/* Temperature Measurement */
+#include <Adafruit_MAX31865.h> // Declare Library 
+Adafruit_MAX31865 max = Adafruit_MAX31865(10, 11, 12, 13); // Declare Pin
+#define RREF      430.0 // The value of the Rref resistor. Use 430.0 for PT100 and 4300.0 for PT1000
+#define RNOMINAL  100.0 // 100.0 for PT100, 1000.0 for PT1000
+
+/* Current Measurement */
+//#include "EmonLib.h"                   // Include Emon Library
+//EnergyMonitor emon1;                   // Create an instance
+
+/* RPM Measurement */ 
+#include "Syergie.h" 
+Proximity speed_1;
+Proximity speed_2;
+int rpm_1,rpm_2;
+
+/* DC Voltage Measurement */
+int analogInput = A1;                                      
+float vout = 0.0;
+float vin = 0.0;
+float R1 = 30000.0; //  
+float R2 = 7500.0; // 
+int value = 0;
+
+/* Driver Motor */
+#define  pwm_right 2
+#define  pwm_left 3
+double pwm1,pwm2;
+
+
+// Update these with values suitable for your network.
+byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
+IPAddress ip(123, 45, 0, 100);
+IPAddress server(123, 45, 0, 10);
+
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+EthernetClient ethClient;
+PubSubClient client(ethClient);
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("box1")) {
+      Serial.println("connected");
+      // Once connected, publish an announcement...
+      //client.publish("outTopic","hello world");
+      // ... and resubscribe
+      client.subscribe("test");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void setup()
+{
+  Serial.begin(57600);
+
+  client.setServer(server, 1883);
+  client.setCallback(callback);
+
+  Ethernet.begin(mac, ip);
+  // Allow the hardware to sort itself out
+  
+  /* RPM */
+  speed_1.pinRPM(A2);
+  speed_2.pinRPM(A3);
+
+   /* Temperature */
+  max.begin(MAX31865_3WIRE);  // set to 2WIRE or 4WIRE as necessary, this is for 3WIRE PT100
+
+   /* Current */
+   //emon1.current(1, 111.1);             // Current: input pin, calibration.
+
+    /* Voltage */
+   pinMode(analogInput, INPUT);
+  delay(1500);
+}
+
+void loop()
+{
+  if (!client.connected()) {
+    reconnect();
+  }
+
+  uint16_t rtd = max.readRTD();
+  float ratio = rtd;
+  ratio /= 32768;
+
+    // RPM Measurement
+  rpm_1 = speed_1.calcRPM();
+  rpm_2 = speed_2.calcRPM();
+
+    // Voltage
+  value = analogRead(analogInput);
+   vout = (value * 5.0) / 1024.0; // see text
+   vin = vout / (R2/(R1+R2));
+
+     //Driver Governor
+  pwm1 = 255;
+  pwm2 = 0;
+  analogWrite(pwm_right, pwm1);
+  analogWrite(pwm_left, pwm2);
+
+  Serial.print("INPUT V= ");
+  Serial.println(vin,2);
+  Serial.print("Temperature = "); Serial.println(max.temperature(RNOMINAL, RREF));
+  Serial.print("RPM ENGINE : ");
+  Serial.print(rpm_1);
+  Serial.print(" -\t- ");
+  Serial.print("RPM Propeller : ");
+  Serial.println(rpm_2);
+  Serial.print("Right : ");
+  Serial.println(pwm1);
+  Serial.print("Left : ");
+  Serial.println(pwm2);
+
+  uint8_t fault = max.readFault();
+  if (fault) {
+    Serial.print("Fault 0x"); Serial.println(fault, HEX);
+    if (fault & MAX31865_FAULT_HIGHTHRESH) {
+      Serial.println("RTD High Threshold"); 
+    }
+    if (fault & MAX31865_FAULT_LOWTHRESH) {
+      Serial.println("RTD Low Threshold"); 
+    }
+    if (fault & MAX31865_FAULT_REFINLOW) {
+      Serial.println("REFIN- > 0.85 x Bias"); 
+    }
+    if (fault & MAX31865_FAULT_REFINHIGH) {
+      Serial.println("REFIN- < 0.85 x Bias - FORCE- open"); 
+    }
+    if (fault & MAX31865_FAULT_RTDINLOW) {
+      Serial.println("RTDIN- < 0.85 x Bias - FORCE- open"); 
+    }
+    if (fault & MAX31865_FAULT_OVUV) {
+      Serial.println("Under/Over voltage"); 
+    }
+    max.clearFault();
+  }
+  
+  client.publish("outTopic","hello world");
+  client.loop();
+}
