@@ -75,7 +75,7 @@ void reconnect() {
 #define winch_in 12 
 
 double pulse_speed_in,pulse_steer_in,pulse_winch_in;
-
+double pulse_SPC_out;
 void setup() {
   //Serial begin
   Serial.begin(57600);
@@ -103,13 +103,22 @@ void setup() {
 char msgBuffer[20];
 void loop() {
 
-//   if (!client.connected()) {
-//    reconnect();
-//  }
+   if (!client.connected()) {
+    reconnect();
+  }
   
     /* Receive Pulse from APM */
    //pulse_speed_in = pulseIn(speed_in,HIGH);
-   pulse_speed_in = analogRead(A0);
+   pulse_speed_in = analogRead(A1);
+   if ((pulse_speed_in >0) && (pulse_speed_in <300)){
+    pulse_SPC_out = 1300;
+   }
+   else if ((pulse_speed_in >350) && (pulse_speed_in <800)){
+    pulse_SPC_out = 1500;
+   }
+   else if (pulse_speed_in >800) {
+    pulse_SPC_out = 1700;
+   }
    analogWrite(9,255);
    Serial.print("Pulse Speed In = ");
    Serial.println(pulse_speed_in);
@@ -125,11 +134,11 @@ void loop() {
 
    if (((not(digitalRead(prop4))) == 1) && ((not(digitalRead(prop3))) == 0)){
    Serial.println("Publishing SPC 1");
-   client.publish("test",dtostrf(pulse_speed_in, 10, 2, msgBuffer));
+   client.publish("pulse_SPC1_out",dtostrf(pulse_SPC_out, 5, 2, msgBuffer));
    }
    else if (((not(digitalRead(prop4))) == 0) && ((not(digitalRead(prop3))) == 1)){
    Serial.println("Publishing SPC 2");
-   client.publish("test",dtostrf(pulse_speed_in, 10, 2, msgBuffer));
+   client.publish("pulse_SPC2_out",dtostrf(pulse_SPC_out, 5, 2, msgBuffer));
    }
    else if (((not(digitalRead(prop4))) == 1) && ((not(digitalRead(prop3))) == 1)){
    Serial.println("Not Publishing ");
